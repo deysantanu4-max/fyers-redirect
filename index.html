@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Redirecting to App...</title>
+    <script>
+      window.onload = function () {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
+        const state = params.get("state") || ""; // Identify broker
+
+        if (code) {
+          let scheme = "fyerscallback"; // Default scheme
+
+          switch (state.toLowerCase()) {
+            case "upstox":
+              scheme = "upstoxcallback";
+              break;
+            case "zerodha":
+              scheme = "zerodhacallback";
+              break;
+            case "iifl":
+              scheme = "iiflcallback";
+              break;
+            case "fyers":
+            default:
+              scheme = "fyerscallback";
+          }
+
+          // Try direct app deep link
+          window.location.href = `${scheme}://auth?code=${code}`;
+
+          // Fallback for Android 11+ browsers
+          setTimeout(() => {
+            window.location.href = `intent://auth?code=${code}#Intent;scheme=${scheme};package=com.aistocksignal;end`;
+          }, 1000);
+        } else {
+          document.body.innerHTML = "No authorization code found.";
+        }
+      };
+    </script>
+  </head>
+  <body>
+    <p>Redirecting to app...</p>
+  </body>
+</html>
